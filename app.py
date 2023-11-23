@@ -4,33 +4,20 @@ from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chains import SimpleSequentialChain
+from langchain.agents import AgentType,initialize_agent,load_tools
+import streamlit as st
 import os
 os.environ['google_api_key'] = 'AIzaSyBKQUeLi1GlQXUnVewYWEL1k6Vvr3wFE9g'
 llm = GooglePalm()
 llm.temperature = 0.1
-# Title
-st.title(" Welcome to  our restaurant")
 
-# Selectbox
-selected_cuisine = st.selectbox("Select a cuisine:", ['Italian', 'French', 'Japanese', 'Indian', 'Mexican'])
+tools = load_tools(['wikipedia'],llm=llm)
 
-# Display selected cuisine
-st.write(f"restaurant, names for  {selected_cuisine} cuisine.")
+st.title("wikiBot")
+agent = initialize_agent( tools,llm,agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,verbose=True)
 
-prompt = PromptTemplate.from_template("Suggest restronant name for  {product}?")
-chain1 = LLMChain(llm =llm,prompt = prompt)
-rest_name= chain1.run(selected_cuisine)
-st.title(rest_name)
+st.write("Ask anything :")
+input = st.text_input("Enter your question :")
+output = agent.run(input)
 
-prompt = PromptTemplate.from_template("Food items in that restorant  {product}?")
-chain2 = LLMChain(llm =llm,prompt = prompt)
-st.write("Our Menu :")
-st.write(chain2.run(rest_name))
-
-prompt = PromptTemplate.from_template("suggest price in indian ruppee  {product}?")
-chain3= LLMChain(llm =llm,prompt = prompt)
-
-Chain  = SimpleSequentialChain(chains = [chain1,chain2,chain3],verbose=True)
-st.write(Chain.run(selected_cuisine))
-
-
+st.write(output)
