@@ -5,7 +5,8 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chains import SimpleSequentialChain
 import os
-os.environ['google_api_key'] = 'AIzaSyBKQUeLi1GlQXUnVewYWEL1k6Vvr3wFE9g'
+load_dotenv()
+os.environ['google_api_key'] = os.getenv('PALM_API_KEY')
 llm = GooglePalm()
 llm.temperature = 0.1
 # Title
